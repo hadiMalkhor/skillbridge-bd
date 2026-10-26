@@ -148,6 +148,7 @@ AREA: prisma/ and src/lib/db.ts
 DETAILS: all entities, enums, relations, unique constraints and indexes from the spec; Prisma client singleton in src/lib/db.ts. Follow the docs of the installed Prisma version for setup.
 DONE WHEN: `npx prisma migrate dev` succeeds against my Neon database and `npx prisma studio` shows every table.
 Give a short plan first, wait for my OK, then implement.
+Also: this project uses Prisma 7. Open the prisma config file in the project root, make sure it loads .env (import "dotenv/config") and points the datasource at DATABASE_URL, and set up the Prisma client with the driver adapter that the installed Prisma 7 docs require for PostgreSQL. Follow the current docs, not older examples.
 ```
 
 **P0.2 — Seed script**
