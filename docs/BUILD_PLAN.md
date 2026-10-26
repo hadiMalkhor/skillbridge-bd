@@ -153,10 +153,21 @@ Also: this project uses Prisma 7. Open the prisma config file in the project roo
 
 **P0.2 — Seed script**
 ```
-TASK: Create prisma/seed.ts (run with `npm run db:seed`).
-DETAILS: ~60 skills for tech/digital jobs with aliases (e.g. JavaScript: js; React: reactjs, react.js; PostgreSQL: postgres, psql; Python; SQL; Figma; Git; Docker; Node.js; TypeScript; Tailwind CSS; Excel; Digital Marketing; SEO; Content Writing; Graphic Design...). 1 admin user (credentials from env vars ADMIN_EMAIL / ADMIN_PASSWORD, bcrypt hashed), 2 fictional employers with organizations, 10 fictional published jobs across experience levels, job types, work arrangements, and Bangladesh locations (Dhaka, Chattogram, Cumilla, Sylhet, Remote), each with 3–6 required skills, and 2 demo candidates with skills and projects.
-The seed must be safe to run twice (upsert).
-DONE WHEN: running it twice produces no errors and no duplicates.
+Read PROJECT_SPEC.md and AGENTS.md first.
+TASK: Create the seed script so the database has demo data. It runs with `npm run db:seed`.
+AREA: prisma/seed.ts, the prisma config file in the project root, package.json (only the db:seed script)
+DETAILS:
+- This project uses Prisma 7. Follow the installed version's docs for how seeding is configured and how the script gets a client (reuse the PostgreSQL driver adapter setup from src/lib/db.ts; do not use older examples).
+- Add the script "db:seed": "tsx prisma/seed.ts" to package.json if it is not there.
+- Skills: about 60 skills for tech and digital jobs, each with aliases (JavaScript: js; React: reactjs, react.js; PostgreSQL: postgres, psql; Node.js: node, nodejs; TypeScript: ts; plus Python, SQL, Figma, Git, Docker, Tailwind CSS, Excel, SEO, Digital Marketing, Content Writing, Graphic Design, and others). Aliases are stored lowercase.
+- 1 admin user. Email and password come from ADMIN_EMAIL and ADMIN_PASSWORD in .env. Hash the password with bcryptjs. Never print the password.
+- 2 fictional employer users, each with an Organization.
+- 10 fictional PUBLISHED jobs spread across experience levels, job types, work arrangements and these locations: Dhaka, Chattogram, Cumilla, Sylhet, Remote. Each job has 3 to 6 required skills.
+- 2 demo candidate users with a CandidateProfile, 4 to 6 skills each, 2 projects each, and evidence links between some skills and projects.
+- All demo accounts use the same demo password, taken from an optional SEED_DEMO_PASSWORD env var (default "Demo@12345"). Document the demo emails in a comment at the top of the file.
+- The script must be safe to run twice (use upsert or check before create). No duplicates.
+DONE WHEN: `npm run db:seed` runs twice with no errors and no duplicate rows, and Prisma Studio shows the data.
+Give a short plan first, wait for my OK, then implement.
 ```
 
 **P0.3 — Authentication and roles**
