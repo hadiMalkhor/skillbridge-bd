@@ -172,11 +172,23 @@ Give a short plan first, wait for my OK, then implement.
 
 **P0.3 — Authentication and roles**
 ```
-TASK: Implement registration, login, logout with Auth.js credentials provider, bcrypt hashing, and role-based access.
-AREA: src/lib/auth/, src/lib/validation/auth.ts, src/app/(auth)/, middleware.ts, src/types/
-DETAILS: register page lets the user choose CANDIDATE or EMPLOYER (never ADMIN); creating a CANDIDATE also creates an empty CandidateProfile; Zod validation; session contains user id and role; helper functions `requireUser()` and `requireRole(role)` for use in Server Actions and pages; middleware redirects unauthenticated users away from /candidate, /employer, /admin, and wrong-role users to a "not allowed" page. Remember middleware is a convenience only: server-side checks are the real protection.
-DONE WHEN: I can register a candidate and an employer, log in/out, and a candidate cannot open /employer or /admin.
-Give a plan first.
+Read PROJECT_SPEC.md and AGENTS.md first.
+TASK: Implement registration, login, logout and role-based access with next-auth v4 (credentials provider) and bcryptjs.
+AREA: src/lib/auth/, src/lib/validation/auth.ts, src/app/(auth)/, src/app/api/auth/[...nextauth]/route.ts, proxy.ts (route protection), src/types/
+DETAILS:
+- Versions installed: next 16.4.3 and next-auth 4.24.15. Stay on next-auth v4 (do not install v5/beta). Follow the official docs for v4 with the Next.js App Router. In Next.js 16 the route-protection file is proxy.ts (not middleware.ts); check the Next.js 16 docs for its exact export format.
+- Use JWT sessions. Put the user id and role into the JWT and session via callbacks, and add a type declaration in src/types/next-auth.d.ts so session.user.id and session.user.role are typed. The auth options use NEXTAUTH_SECRET from .env.
+- Register page (/register): name, email, password, and a role choice of CANDIDATE or EMPLOYER only. ADMIN can never be chosen or created here. Zod validation on the server: valid email, password at least 8 characters, name required. Reject duplicate emails with a generic friendly message.
+- Registering a CANDIDATE also creates an empty CandidateProfile for that user (in one transaction).
+- Login page (/login) and a logout button. Use the same error message for "wrong email" and "wrong password".
+- Never put passwordHash in the session, the JWT, or any returned object.
+- Create helpers in src/lib/auth/: requireUser() and requireRole(role) for server components and Server Actions, based on getServerSession. They check the session on the server and redirect when not allowed.
+- proxy.ts: redirect visitors who are not logged in away from /candidate, /employer and /admin to /login, and send wrong-role users to a simple /not-allowed page (create it). In proxy.ts use only Edge-safe code (read the token with next-auth/jwt getToken). Do NOT import Prisma or bcrypt in proxy.ts. This is only a convenience; the real protection is requireRole() inside each page and action.
+- Add placeholder pages /candidate/profile, /employer/organization and /admin/reports that call requireRole() and show "Welcome, [name] (ROLE)". They exist only to test role protection.
+- Seeded accounts must be able to log in.
+- Do not touch prisma/schema.prisma. If you need a schema change, stop and tell me.
+DONE WHEN: I can register a candidate and an employer, log in and out, a seeded admin can open /admin/reports, and a candidate cannot open /employer/organization or /admin/reports.
+Give a short plan first, wait for my OK, then implement.
 ```
 
 **P0.4 — Layout and navigation**
